@@ -19,7 +19,7 @@ This project is a Puppeteer-powered Instagram bot that automates sending message
 
 1. **Clone the repository**:
    
-   git clone https://github.com/Dev-Franqqi/Instagram-bot.git
+   git clone https://github.com/Dev-Franqqi/instagram-bot.git
    cd instagram-bot
 
 2. **Install the dependencies**:
