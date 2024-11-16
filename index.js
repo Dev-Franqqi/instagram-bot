@@ -3,7 +3,7 @@ const fs = require('fs');
 require('dotenv').config();
 (async () => {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         userDataDir: './tmp',
         defaultViewport: false
     });
