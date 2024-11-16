@@ -27,11 +27,12 @@ const { parseEnv } = require('util');
     await loadCSV();
 
     // Launch Puppeteer
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: false ,defaultViewport:false});
     const page = await browser.newPage();
 
     // Navigate to the first URL from the CSV
     if (results.length > 0) {
+      
       await page.goto(results[0].URL);
       console.log(`Navigated to: ${results[0].URL}`);
       await page.waitForSelector('a')
@@ -62,7 +63,7 @@ const { parseEnv } = require('util');
               if(notNowButton){
                 await notNowButton.click();
                 console.log('Not now clicked');
-                await page.goto(results[0].URL);
+                await page.goto(results[2].URL);
                 await new Promise(resolve=>setTimeout(resolve,3000))
                 await page.waitForSelector('.x6s0dn4.x78zum5.xdt5ytf.xl56j7k')
                 const options = await page.$('.x6s0dn4.x78zum5.xdt5ytf.xl56j7k svg[aria-label="Options"]')
@@ -90,8 +91,9 @@ const { parseEnv } = require('util');
                           for (const sendButton of sendButtons){
                             const targetButton = await page.evaluate(el=>el.textContent === 'Send',sendButton)
                             if(targetButton){
-                              await targetButton.click()
+                              await sendButton.click()
                               console.log('message sent')
+                              break;
                             }
                           }
 
@@ -101,7 +103,55 @@ const { parseEnv } = require('util');
                       break;
                     }
                     else{
-                      console.log('No send message button')
+                      console.log('No send message button found') 
+                    const buttons = await page.$$('button')
+                    for (const button of buttons){
+                      const targetButton = page.evaluate(el=> el.textContent === 'Cancel',button)
+                      if(targetButton){
+                        await button.click()
+                        console.log('Cancel clicked')
+                        const buttons = await page.$$('div[role="button"]');
+                        for (const button of buttons){
+                          const targetButton = await page.evaluate(el=>el.textContent === 'Message',button)
+                          if(targetButton){
+                            await button.click()
+                            console.log('send message button clicked')
+                            await new Promise(resolve=>setTimeout(resolve,3000))
+                            await page.waitForSelector('._a9--._ap36._a9_1')
+                            const newNotNow = await page.$('._a9--._ap36._a9_1')
+                            if(newNotNow){
+                              await newNotNow.click();
+                              console.log('New not now clicked');
+                              await new Promise(resolve=>setTimeout(resolve,3000))
+                              await page.waitForSelector('div[aria-describedby="Message"]')
+                              const messageInput = await page.$('div[aria-describedby="Message"]')
+                              if(messageInput){
+                                await messageInput.type("Ciao mio adorabile fan")
+                                const sendButtons = await page.$$('div[role="button"]')
+                                for (const sendButton of sendButtons){
+                                  const targetButton = await page.evaluate(el=>el.textContent === 'Send',sendButton)
+                                  if(targetButton){
+                                    await sendButton.click()
+                                    console.log('message sent')
+                                    break;
+                                  }
+                                }
+      
+                              }
+                              break;
+                            }
+                            
+
+                            break;
+                          }
+                          else{
+                            console.log('No send message button found')
+                          }
+                        }
+                        break;
+                      }
+                    }
+
                     }
                     
 
